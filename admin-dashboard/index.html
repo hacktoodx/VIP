@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Membership System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin-style.css" />
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div style="font-size:40px;margin-bottom:12px;">🔐</div>
+    <h3>Admin Login</h3>
+    <p>กรอก PIN เพื่อเข้าใช้งาน</p>
+    <input type="password" id="pinInput" maxlength="6" placeholder="• • • • • •" />
+    <div class="error-msg" id="pinError"></div>
+    <button class="btn btn-primary w-100" onclick="doLogin()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="brand">🛡️ Admin Panel</div>
+  <a href="index.html" class="nav-link active">
+    <span class="icon">📊</span> Dashboard
+  </a>
+  <a href="members.html" class="nav-link">
+    <span class="icon">👥</span> สมาชิก
+  </a>
+  <a href="payments.html" class="nav-link">
+    <span class="icon">💳</span> การชำระเงิน
+  </a>
+  <a href="broadcast.html" class="nav-link">
+    <span class="icon">📢</span> Broadcast
+  </a>
+  <div style="position:absolute;bottom:20px;left:0;right:0;padding:0 20px;">
+    <button class="btn btn-outline-light btn-sm w-100" onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="page-header">
+    <h2>📊 Dashboard ภาพรวม</h2>
+    <p id="lastUpdated">กำลังโหลดข้อมูล...</p>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="row">
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div class="stat-info">
+          <div class="value" id="statTotalUsers">-</div>
+          <div class="label">ผู้ใช้ทั้งหมด</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info">
+          <div class="value" id="statActiveMembers">-</div>
+          <div class="label">สมาชิก Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon orange">⏳</div>
+        <div class="stat-info">
+          <div class="value" id="statPendingPayments">-</div>
+          <div class="label">รอการอนุมัติ</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon red">⏰</div>
+        <div class="stat-info">
+          <div class="value" id="statExpiringSoon">-</div>
+          <div class="label">หมดอายุใน 3 วัน</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Payments -->
+  <div class="data-card">
+    <div class="card-header-custom">
+      <h5>💳 การชำระเงินล่าสุด</h5>
+      <a href="payments.html" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
+    </div>
+    <div id="recentPayments">
+      <div class="loading-spinner">⏳ กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <!-- Expiring Soon -->
+  <div class="data-card">
+    <div class="card-header-custom">
+      <h5>⏰ สมาชิกใกล้หมดอายุ (3 วัน)</h5>
+      <a href="members.html" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
+    </div>
+    <div id="expiringSoon">
+      <div class="loading-spinner">⏳ กำลังโหลด...</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/admin-auth.js"></script>
+<script>
+  // ตรวจสอบ Auth เมื่อโหลดหน้า
+  requireAuth();
+
+  function doLogin() {
+    const pin = document.getElementById("pinInput").value;
+    if (!verifyPin(pin)) {
+      document.getElementById("pinError").textContent = "❌ PIN ไม่ถูกต้อง";
+      document.getElementById("pinInput").value = "";
+    } else {
+      loadDashboard();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (sessionStorage.getItem("admin_authed") === "true") {
+      loadDashboard();
+    }
+    // กด Enter เพื่อ login
+    document.getElementById("pinInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") doLogin();
+    });
+  });
+
+  async function loadDashboard() {
+    const now = new Date();
+    document.getElementById("lastUpdated").textContent =
+      "อัปเดตล่าสุด: " + formatDate(now);
+
+    await Promise.all([
+      loadStats(),
+      loadRecentPayments(),
+      loadExpiringSoon()
+    ]);
+  }
+
+  async function loadStats() {
+    try {
+      // นับผู้ใช้ทั้งหมด
+      const usersSnap = await db.collection("users").get();
+      document.getElementById("statTotalUsers").textContent = usersSnap.size;
+
+      // นับสมาชิก Active
+      const activeSnap = await db.collection("memberships")
+        .where("status", "==", "active").get();
+      document.getElementById("statActiveMembers").textContent = activeSnap.size;
+
+      // นับรายการรอ
+      const pendingSnap = await db.collection("payments")
+        .where("status", "==", "pending").get();
+      document.getElementById("statPendingPayments").textContent = pendingSnap.size;
+
+      // นับสมาชิกหมดอายุใน 3 วัน
+      const in3Days = new Date();
+      in3Days.setDate(in3Days.getDate() + 3);
+      const expiringSnap = await db.collection("memberships")
+        .where("status", "==", "active")
+        .where("expire_date", "<=", in3Days).get();
+      document.getElementById("statExpiringSoon").textContent = expiringSnap.size;
+
+    } catch (err) {
+      console.error("loadStats error:", err);
+    }
+  }
+
+  async function loadRecentPayments() {
+    const container = document.getElementById("recentPayments");
+    try {
+      const snap = await db.collection("payments")
+        .orderBy("submitted_at", "desc").limit(5).get();
+
+      if (snap.empty) {
+        container.innerHTML = '<p class="text-muted text-center py-3">ยังไม่มีรายการ</p>';
+        return;
+      }
+
+      let html = '<table class="table table-hover mb-0"><thead><tr>' +
+        '<th>ผู้ใช้</th><th>แพ็กเกจ</th><th>ยอด</th><th>วิธีชำระ</th><th>สถานะ</th><th>เวลา</th>' +
+        '</tr></thead><tbody>';
+
+      snap.forEach(function (doc) {
+        const p = doc.data();
+        const date = p.submitted_at?.toDate ? p.submitted_at.toDate() : new Date(p.submitted_at);
+        html += `<tr>
+          <td>${p.telegram_id}</td>
+          <td>${escapeHtml(p.package_name)}</td>
+          <td>${p.amount} บาท</td>
+          <td>${p.payment_method === "bank_transfer" ? "🏦 โอนธนาคาร" : "💰 PayPal"}</td>
+          <td><span class="badge-status badge-${p.status}">${statusLabel(p.status)}</span></td>
+          <td>${formatDate(date)}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+
+    } catch (err) {
+      container.innerHTML = '<p class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</p>';
+    }
+  }
+
+  async function loadExpiringSoon() {
+    const container = document.getElementById("expiringSoon");
+    try {
+      const in3Days = new Date();
+      in3Days.setDate(in3Days.getDate() + 3);
+
+      const snap = await db.collection("memberships")
+        .where("status", "==", "active")
+        .where("expire_date", "<=", in3Days)
+        .orderBy("expire_date", "asc")
+        .limit(10).get();
+
+      if (snap.empty) {
+        container.innerHTML = '<p class="text-muted text-center py-3">ไม่มีสมาชิกใกล้หมดอายุ 🎉</p>';
+        return;
+      }
+
+      let html = '<table class="table table-hover mb-0"><thead><tr>' +
+        '<th>User ID</th><th>แพ็กเกจ</th><th>หมดอายุ</th>' +
+        '</tr></thead><tbody>';
+
+      snap.forEach(function (doc) {
+        const m = doc.data();
+        const expDate = m.expire_date?.toDate ? m.expire_date.toDate() : new Date(m.expire_date);
+        html += `<tr>
+          <td>${m.telegram_id}</td>
+          <td>${escapeHtml(m.package_name)}</td>
+          <td class="text-danger fw-bold">${formatDate(expDate)}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+
+    } catch (err) {
+      container.innerHTML = '<p class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</p>';
+    }
+  }
+
+  function formatDate(date) {
+    if (!date) return "-";
+    const d = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const y = date.getFullYear();
+    const h = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${d}/${m}/${y} ${h}:${min}`;
+  }
+
+  function statusLabel(status) {
+    const map = { pending: "รอตรวจสอบ", approved: "อนุมัติแล้ว",
+      rejected: "ปฏิเสธ", active: "Active", expired: "หมดอายุ" };
+    return map[status] || status;
+  }
+
+  function escapeHtml(text) {
+    if (!text) return "";
+    const d = document.createElement("div");
+    d.textContent = text;
+    return d.innerHTML;
+  }
+</script>
+</body>
+</html>
