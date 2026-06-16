@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>หน้าหลัก - Membership</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-header">
+    <img src="assets/logo.png" alt="logo" class="logo" />
+    <h1 id="shopName">My VIP Membership</h1>
+    <p>ระบบสมาชิกอัตโนมัติผ่าน Telegram</p>
+  </div>
+
+  <div id="membershipStatus"></div>
+
+  <div class="card">
+    <div class="card-title">📦 แพ็กเกจสมาชิก</div>
+    <div class="card-subtitle">เลือกแพ็กเกจที่เหมาะกับคุณ พร้อมสิทธิพิเศษมากมาย</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💳 ชำระเงินง่าย</div>
+    <div class="card-subtitle">รองรับการโอนผ่านธนาคารและ PayPal</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ อนุมัติรวดเร็ว</div>
+    <div class="card-subtitle">ทีมแอดมินตรวจสอบและอนุมัติภายในไม่กี่นาที</div>
+  </div>
+
+  <button class="main-button" id="btnSelectPackage">เลือกแพ็กเกจสมาชิก</button>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
