@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>เลือกวิธีชำระเงิน</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-header">
+    <h1>💳 เลือกวิธีชำระเงิน</h1>
+    <p id="orderSummary"></p>
+  </div>
+
+  <div id="paymentMethods">
+    <div class="loading">⏳ กำลังโหลดข้อมูล...</div>
+  </div>
+
+  <div id="paymentDetail"></div>
+
+  <button class="main-button" id="btnNext" disabled>เลือกวิธีชำระเงินก่อน</button>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/payment.js"></script>
+</body>
+</html>
