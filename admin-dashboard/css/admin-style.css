@@ -1,0 +1,253 @@
+/* admin-style.css */
+
+body {
+  background-color: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.sidebar {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1f36 0%, #2d3561 100%);
+  width: 240px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 20px 0;
+  z-index: 100;
+}
+
+.sidebar .brand {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 16px;
+}
+
+.sidebar .nav-link {
+  color: rgba(255,255,255,0.7);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border-left-color: #4e9af1;
+}
+
+.sidebar .nav-link .icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.main-content {
+  margin-left: 240px;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1f36;
+  margin: 0;
+}
+
+.page-header p {
+  color: #6b7280;
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-card .stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-card .stat-icon.blue { background: #e0edff; }
+.stat-card .stat-icon.green { background: #dcfce7; }
+.stat-card .stat-icon.orange { background: #fff3e0; }
+.stat-card .stat-icon.red { background: #fce4e4; }
+
+.stat-card .stat-info .value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1f36;
+  line-height: 1;
+}
+
+.stat-card .stat-info .label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.data-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+
+.data-card .card-header-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.data-card .card-header-custom h5 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1f36;
+}
+
+.table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  font-weight: 600;
+  background: #f9fafb;
+}
+
+.table td {
+  font-size: 14px;
+  vertical-align: middle;
+  color: #374151;
+}
+
+.badge-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-active { background: #dcfce7; color: #15803d; }
+.badge-pending { background: #fef9c3; color: #a16207; }
+.badge-expired { background: #f3f4f6; color: #6b7280; }
+.badge-rejected { background: #fee2e2; color: #b91c1c; }
+.badge-approved { background: #dcfce7; color: #15803d; }
+
+.btn-action {
+  padding: 4px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+/* Login Overlay */
+#loginOverlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.login-box h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.login-box p {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 6px;
+  margin-bottom: 12px;
+  outline: none;
+}
+
+.login-box input:focus {
+  border-color: #4e9af1;
+}
+
+.login-box .error-msg {
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.slip-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
