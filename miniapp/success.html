@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ส่งข้อมูลสำเร็จ</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="success-container">
+    <div class="success-icon">✅</div>
+    <div class="success-title">ส่งข้อมูลสำเร็จ!</div>
+    <div class="success-desc">
+      ระบบได้รับสลิปการชำระเงินของคุณแล้ว<br/><br/>
+      ทีมแอดมินจะทำการตรวจสอบและอนุมัติภายในไม่กี่นาที<br/>
+      เมื่อได้รับการอนุมัติ คุณจะได้รับ <b>ลิงก์เข้ากลุ่ม</b> ทาง Telegram ทันที<br/><br/>
+      ขอบคุณที่ใช้บริการ 🙏
+    </div>
+  </div>
+
+  <button class="main-button" id="btnClose">ปิดหน้านี้</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    document.getElementById("btnClose").addEventListener("click", function () {
+      tg.close();
+    });
+  </script>
+</body>
+</html>
