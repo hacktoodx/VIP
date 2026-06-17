@@ -6,17 +6,183 @@
   <title>ส่งข้อมูลสำเร็จ</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    .success-icon {
+      text-align: center;
+      font-size: 64px;
+      margin: 32px 0 16px;
+    }
+
+    .success-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--tg-theme-text-color, #000000);
+    }
+
+    .success-subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, #999999);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ✅ กล่องสรุปรายละเอียดการสมัคร */
+    .summary-box {
+      background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .summary-box .summary-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--tg-theme-text-color, #000000);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--tg-theme-hint-color, #dddddd);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, #888888);
+      flex-shrink: 0;
+      margin-right: 12px;
+    }
+
+    .summary-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--tg-theme-text-color, #000000);
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .summary-value.highlight {
+      color: var(--tg-theme-button-color, #2481cc);
+      font-size: 16px;
+    }
+
+    /* ✅ Badge สถานะ */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #fff8e1;
+      color: #f57f17;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ✅ กล่องข้อความแจ้งเตือน */
+    .notice-box {
+      background-color: var(--tg-theme-secondary-bg-color, #f0f4ff);
+      border-left: 4px solid var(--tg-theme-button-color, #2481cc);
+      border-radius: 0 12px 12px 0;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--tg-theme-text-color, #333333);
+      line-height: 1.6;
+    }
+
+    .notice-box strong {
+      color: var(--tg-theme-button-color, #2481cc);
+    }
+
+    .main-button {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background-color: var(--tg-theme-button-color, #2481cc);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <div class="success-container">
-    <div class="success-icon">✅</div>
-    <div class="success-title">ส่งข้อมูลสำเร็จ!</div>
-    <div class="success-desc">
-      ระบบได้รับสลิปการชำระเงินของคุณแล้ว<br/><br/>
-      ทีมแอดมินจะทำการตรวจสอบและอนุมัติภายในไม่กี่นาที<br/>
-      เมื่อได้รับการอนุมัติ คุณจะได้รับ <b>ลิงก์เข้ากลุ่ม</b> ทาง Telegram ทันที<br/><br/>
-      ขอบคุณที่ใช้บริการ 🙏
+
+  <!-- Icon และหัวข้อ -->
+  <div class="success-icon">✅</div>
+  <div class="success-title">ส่งข้อมูลสำเร็จแล้ว!</div>
+  <div class="success-subtitle">
+    ระบบได้รับสลิปการชำระเงินของคุณแล้ว
+  </div>
+
+  <!-- ✅ กล่องสรุปรายละเอียดการสมัคร -->
+  <div class="summary-box">
+    <div class="summary-title">📋 รายละเอียดการสมัคร</div>
+
+    <div class="summary-row">
+      <span class="summary-label">แพ็กเกจ</span>
+      <span class="summary-value highlight" id="summaryPackage">-</span>
     </div>
+
+    <div class="summary-row">
+      <span class="summary-label">ราคา</span>
+      <span class="summary-value" id="summaryAmount">-</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">วิธีชำระ</span>
+      <span class="summary-value" id="summaryMethod">-</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">วันที่ทำรายการ</span>
+      <span class="summary-value" id="summaryDate">-</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">เลขที่รายการ</span>
+      <span class="summary-value" id="summaryPaymentId" style="font-size:12px;">-</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">สถานะ</span>
+      <span class="summary-value">
+        <span class="status-badge" id="summaryStatus">
+          ⏳ รอตรวจสอบการชำระเงิน
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ✅ กล่องแจ้งขั้นตอนถัดไป -->
+  <div class="notice-box">
+    ทีมแอดมินจะตรวจสอบและอนุมัติภายในไม่กี่นาที<br />
+    เมื่อได้รับการอนุมัติ คุณจะได้รับ
+    <strong>ลิงก์เข้ากลุ่ม VIP</strong>
+    ทาง Telegram ทันที 🔐
   </div>
 
   <button class="main-button" id="btnClose">ปิดหน้านี้</button>
@@ -26,9 +192,76 @@
     tg.expand();
     tg.ready();
 
-    document.getElementById("btnClose").addEventListener("click", function () {
-      tg.close();
+    // ✅ โหลดข้อมูลสรุปจาก sessionStorage ที่ upload-slip.js บันทึกไว้
+    document.addEventListener("DOMContentLoaded", function () {
+      const raw = sessionStorage.getItem("payment_summary");
+
+      if (raw) {
+        try {
+          const summary = JSON.parse(raw);
+
+          // แพ็กเกจ
+          if (summary.package_name) {
+            document.getElementById("summaryPackage").textContent = summary.package_name;
+          }
+
+          // ราคา
+          if (summary.amount) {
+            document.getElementById("summaryAmount").textContent =
+              Number(summary.amount).toLocaleString("th-TH") + " บาท";
+          }
+
+          // วิธีชำระ
+          if (summary.payment_method) {
+            document.getElementById("summaryMethod").textContent =
+              summary.payment_method === "bank_transfer" ? "🏦 โอนธนาคาร" : "💰 PayPal";
+          }
+
+          // วันที่ทำรายการ
+          if (summary.submitted_at) {
+            const date = new Date(summary.submitted_at);
+            document.getElementById("summaryDate").textContent = formatDate(date);
+          }
+
+          // เลขที่รายการ
+          if (summary.payment_id) {
+            document.getElementById("summaryPaymentId").textContent = summary.payment_id;
+          }
+
+          // ล้างข้อมูลหลังแสดงแล้ว
+          sessionStorage.removeItem("payment_summary");
+
+        } catch (e) {
+          console.error("Error parsing payment_summary:", e);
+        }
+      }
+
+      // ปุ่มปิด
+      document.getElementById("btnClose").addEventListener("click", function () {
+        tg.close();
+      });
     });
+
+    /**
+     * แปลง Date เป็น "DD เดือน YYYY HH:mm น."
+     * @param {Date} date
+     * @return {string}
+     */
+    function formatDate(date) {
+      const months = [
+        "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน",
+        "พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม",
+        "กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+      ];
+
+      const d   = date.getDate();
+      const m   = months[date.getMonth()];
+      const y   = date.getFullYear() + 543; // แปลงเป็น พ.ศ.
+      const h   = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+
+      return d + " " + m + " " + y + " เวลา " + h + ":" + min + " น.";
+    }
   </script>
 </body>
 </html>
